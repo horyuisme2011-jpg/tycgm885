@@ -2,17 +2,17 @@
   "step1": [
     {
       "id": "class",
-      "label": "¯Z¯Å",
+      "label": "ï¿½Zï¿½ï¿½",
       "required": true
     },
     {
       "id": "name",
-      "label": "©m¦W",
+      "label": "ï¿½mï¿½W",
       "required": true
     },
     {
       "id": "no",
-      "label": "®y¸¹",
+      "label": "ï¿½yï¿½ï¿½",
       "required": true
     },
     {
