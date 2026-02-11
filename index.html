@@ -227,7 +227,6 @@
             ]
         };
 
-        // 初始化第一步欄位
         const f1Container = document.getElementById('form1_fields');
         gconfig1.fields.forEach(f => {
             f1Container.innerHTML += `
@@ -264,29 +263,22 @@
             document.getElementById('know_row').classList.remove('row-error');
         }
 
+        // --- 修改後的提交邏輯 ---
         async function submitFinal() {
             let isValid = true;
             const t = document.getElementById('t_val'), p = document.getElementById('p_val'), d = document.getElementById('desc_val');
             const knowRadio = document.querySelector('input[name="know"]:checked');
             const submitBtn = document.getElementById('final-submit');
 
-            // 基礎驗證
             [t, p, d].forEach(el => { if (!el.disabled && !el.value.trim()) { el.classList.add('input-error'); isValid = false; } });
             if (!knowRadio) { document.getElementById('know_row').classList.add('row-error'); isValid = false; }
-            if (knowRadio?.value === 'yes') {
-                const pc = document.getElementById('p_class'), pn = document.getElementById('p_name');
-                if (!pc.value.trim()) { pc.classList.add('input-error'); isValid = false; }
-                if (!pn.value.trim()) { pn.classList.add('input-error'); isValid = false; }
-            }
 
             if (!isValid) return;
 
-            // 準備打包資料
             submitBtn.disabled = true;
             submitBtn.innerText = "傳送中...";
 
             const soss995Data = {
-                "timestamp": new Date().toLocaleString(),
                 "reporter": {
                     "class": document.getElementById('class').value,
                     "name": document.getElementById('name').value,
@@ -305,17 +297,25 @@
                 }
             };
 
-            console.log("資料包已生成:", soss995Data);
+            try {
+                // 發送到 Vercel Serverless Function
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(soss995Data)
+                });
 
-            /* --- 注意 ---
-               這裡建議對接到一個 Vercel API 或 Google Apps Script
-               不要在前端直接寫 GitHub Token。
-            */
-
-            // 模擬 API 延遲
-            setTimeout(() => {
-                showSuccess();
-            }, 1500);
+                if (response.ok) {
+                    showSuccess();
+                } else {
+                    alert("傳送失敗，請聯繫管理員");
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("網路異常，請稍後再試");
+                submitBtn.disabled = false;
+            }
         }
 
         function showSuccess() {
@@ -323,12 +323,12 @@
             card.style.opacity = '0';
             setTimeout(() => {
                 card.innerHTML = `
-                        <h2 style="color: var(--success-green);">傳送成功</h2>
-                        <p style="line-height: 1.8; font-size: 1.1rem; text-align: left;">
-                            我們已收到你的求助資訊。請放心，這些內容只有相關負責老師可以看到，我們會盡快協助妳處理。
-                        </p>
-                        <button class="next-btn" onclick="window.location.reload()">完成並退出</button>
-                    `;
+                            <h2 style="color: var(--success-green);">傳送成功</h2>
+                            <p style="line-height: 1.8; font-size: 1.1rem; text-align: left;">
+                                我們已收到你的求助資訊。請放心，這些內容只有相關負責老師可以看到，我們會盡快協助妳處理。
+                            </p>
+                            <button class="next-btn" onclick="window.location.reload()">完成並退出</button>
+                        `;
                 card.style.opacity = '1';
             }, 400);
         }

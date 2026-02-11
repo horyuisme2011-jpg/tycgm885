@@ -1,0 +1,13 @@
+# Visual Studio º»¶s¿…
+.vs/
+[Bb]in/
+[Obj]/
+*.user
+*.suo
+*.sln.docstates
+
+# Vercel & Node º»¶s¿…
+.vercel
+node_modules/
+.env
+.env.local
