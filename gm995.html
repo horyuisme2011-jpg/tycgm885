@@ -1,0 +1,301 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMJH 770885 - 尋求協助</title>
+    <style>
+        :root {
+            --error-red: #ff4d4d;
+            --glass: rgba(255, 255, 255, 0.1);
+            --gold: #f39c12;
+            --text-white: #ffffff;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+            .row label {
+                min-width: 105px;
+                font-size: 1rem;
+            }
+
+        .star {
+            color: var(--error-red);
+            margin-left: 4px;
+        }
+
+        input[type="text"], textarea {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: white;
+            outline: none;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        input:disabled {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .input-error {
+            border: 2px solid var(--error-red) !important;
+        }
+
+        .row-error {
+            border: 2px solid var(--error-red);
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .inline-options {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 8px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .next-btn {
+            display: block;
+            width: 140px;
+            margin: 30px auto 0;
+            padding: 12px;
+            background: white;
+            color: #1a2a6c;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .next-btn:hover {
+                background: var(--gold);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        #person_fields {
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+            #person_fields .row label {
+                min-width: 50px;
+            }
+    </style>
+</head>
+<body>
+
+    <div id="step1" class="glass-card">
+        <h2>你的連絡資訊</h2>
+        <div id="form1_fields"></div>
+        <button class="next-btn" onclick="toStep2()">下一步</button>
+        <p style="text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 20px;">請放心 你的資料不會外流~</p>
+    </div>
+
+    <div id="step2" class="glass-card hidden">
+        <h2>發生甚麼事了？</h2>
+        <div class="row">
+            <label>時間<span class="star">*</span></label>
+            <input type="text" id="t_val" oninput="this.classList.remove('input-error')">
+            <label class="check-item"><input type="checkbox" id="t_forget" onchange="toggleInput('t_val', this)">不記得</label>
+        </div>
+        <div class="row">
+            <label>地點<span class="star">*</span></label>
+            <input type="text" id="p_val" oninput="this.classList.remove('input-error')">
+            <label class="check-item"><input type="checkbox" id="p_forget" onchange="toggleInput('p_val', this)">不記得</label>
+        </div>
+        <div id="know_row" class="inline-options">
+            <span style="font-size: 0.95rem;">事件行為人 你/妳知道是誰嗎？<span class="star">*</span></span>
+            <label class="check-item"><input type="radio" name="know" value="yes" onclick="togglePerson(true); clearKnowError()">知道</label>
+            <label class="check-item"><input type="radio" name="know" value="no" onclick="togglePerson(false); clearKnowError()">不知道</label>
+        </div>
+        <div id="person_fields" class="hidden">
+            <div class="row">
+                <label>班級<span class="star">*</span></label>
+                <input type="text" id="p_class" style="max-width:80px; margin-right:15px;" oninput="this.classList.remove('input-error')">
+                <label>姓名<span class="star">*</span></label>
+                <input type="text" id="p_name" oninput="this.classList.remove('input-error')">
+            </div>
+        </div>
+        <div style="margin-top:10px;">
+            <label>事件發生簡述<span class="star">*</span></label>
+            <textarea id="desc_val" oninput="this.classList.remove('input-error')"></textarea>
+        </div>
+        <button class="next-btn" onclick="submitFinal()">下一步</button>
+    </div>
+
+    <script>
+        // 配置邏輯
+        const gconfig1 = {
+            "fields": [
+                { "id": "class", "label": "班級", "required": true },
+                { "id": "name", "label": "姓名", "required": true },
+                { "id": "no", "label": "座號", "required": true },
+                { "id": "instagram", "label": "Instagram ID", "required": false }
+            ]
+        };
+
+        const f1Container = document.getElementById('form1_fields');
+        gconfig1.fields.forEach(f => {
+            f1Container.innerHTML += `<div class="row"><label>${f.label}${f.required ? '<span class="star">*</span>' : ''}</label><input type="text" id="${f.id}" oninput="this.classList.remove('input-error')"></div>`;
+        });
+
+        function toStep2() {
+            let ok = true;
+            gconfig1.fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (f.required && !el.value.trim()) { el.classList.add('input-error'); ok = false; }
+            });
+            if (ok) {
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+            }
+        }
+
+        function toggleInput(id, cb) {
+            const input = document.getElementById(id);
+            input.disabled = cb.checked;
+            input.classList.remove('input-error');
+            if (cb.checked) input.value = "";
+        }
+
+        function togglePerson(show) {
+            document.getElementById('person_fields').classList.toggle('hidden', !show);
+        }
+
+        function clearKnowError() {
+            document.getElementById('know_row').classList.remove('row-error');
+        }
+
+        function submitFinal() {
+            let isValid = true;
+            const t = document.getElementById('t_val'), p = document.getElementById('p_val'), d = document.getElementById('desc_val');
+            const knowRadio = document.querySelector('input[name="know"]:checked');
+
+            // 驗證
+            if (!t.disabled && !t.value.trim()) { t.classList.add('input-error'); isValid = false; }
+            if (!p.disabled && !p.value.trim()) { p.classList.add('input-error'); isValid = false; }
+            if (!d.value.trim()) { d.classList.add('input-error'); isValid = false; }
+            if (!knowRadio) { document.getElementById('know_row').classList.add('row-error'); isValid = false; }
+
+            if (knowRadio && knowRadio.value === 'yes') {
+                const pc = document.getElementById('p_class'), pn = document.getElementById('p_name');
+                if (!pc.value.trim()) { pc.classList.add('input-error'); isValid = false; }
+                if (!pn.value.trim()) { pn.classList.add('input-error'); isValid = false; }
+            }
+
+            if (isValid) {
+                // 打包成 JSON 物件
+                const soss995Data = {
+                    "timestamp": new Date().toLocaleString(),
+                    "reporter": {
+                        "class": document.getElementById('class').value,
+                        "name": document.getElementById('name').value,
+                        "no": document.getElementById('no').value,
+                        "instagram": document.getElementById('instagram').value
+                    },
+                    "event": {
+                        "time": document.getElementById('t_forget').checked ? "不記得" : t.value,
+                        "place": document.getElementById('p_forget').checked ? "不記得" : p.value,
+                        "know_who": knowRadio.value,
+                        "target": knowRadio.value === 'yes' ? {
+                            "class": document.getElementById('p_class').value,
+                            "name": document.getElementById('p_name').value
+                        } : "未知",
+                        "description": d.value
+                    }
+                };
+
+                // 此處將 JSON 物件顯示在控制台，供開發者檢查
+                console.log("生成的 JSON (準備寫入 soss995.json):", JSON.stringify(soss995Data, null, 2));
+
+                // 畫面切換至成功訊息
+                const card = document.querySelector('.glass-card:not(.hidden)');
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.innerHTML = `
+                            <h2 style="color: #2ecc71;">傳送成功</h2>
+                            <p style="line-height: 1.8; font-size: 1.1rem; text-align: left;">
+                                我們收到你的資料，妳放心，這些資料不會讓第三方所知，並交給學校相關處室協助妳，希望可以得到滿意的結果~
+                            </p>
+                            <button class="next-btn" onclick="window.location.href='https://tycgmjhnm.vercel.app/'">回到首頁</button>
+                        `;
+                    card.style.opacity = '1';
+                }, 400);
+            }
+        }
+    </script>
+</body>
+</html>

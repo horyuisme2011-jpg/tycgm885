@@ -1,0 +1,36 @@
+{
+  "step1": [
+    {
+      "id": "class",
+      "label": "¯Z¯Å",
+      "required": true
+    },
+    {
+      "id": "name",
+      "label": "©m¦W",
+      "required": true
+    },
+    {
+      "id": "no",
+      "label": "®y¸¹",
+      "required": true
+    },
+    {
+      "id": "ig_id",
+      "label": "IG ID",
+      "required": false
+    }
+  ],
+  "step2": {
+    "time_group": {
+      "required": true,
+      "toggle_by": "time_unknown"
+    },
+    "place_group": {
+      "required": true,
+      "toggle_by": "place_unknown"
+    },
+    "description": { "required": true },
+    "target_person": { "show_if_know": true }
+  }
+}
