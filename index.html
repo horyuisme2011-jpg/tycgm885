@@ -108,13 +108,6 @@
             white-space: nowrap;
         }
 
-        .inline-options {
-            margin-bottom: 18px;
-            padding: 8px;
-            border: 2px solid transparent;
-            transition: 0.3s;
-        }
-
         .next-btn {
             display: block;
             width: 140px;
@@ -195,7 +188,7 @@
             <input type="text" id="p_val" placeholder="例如：操場後方">
             <label class="check-item"><input type="checkbox" id="p_forget" onchange="toggleInput('p_val', this)">不記得</label>
         </div>
-        <div id="know_row" class="inline-options">
+        <div id="know_row" style="margin-bottom: 18px; padding: 8px; border: 2px solid transparent;">
             <p style="font-size: 0.95rem; margin-bottom: 10px;">事件行為人 你/妳知道是誰嗎？<span class="star">*</span></p>
             <div style="display: flex; gap: 20px;">
                 <label class="check-item"><input type="radio" name="know" value="yes" onclick="togglePerson(true); clearKnowError()">知道</label>
@@ -210,7 +203,7 @@
                 <input type="text" id="p_name" placeholder="王小明">
             </div>
         </div>
-        <div style="margin-top:10px;">
+        <div>
             <label>事件發生簡述<span class="star">*</span></label>
             <textarea id="desc_val" placeholder="請盡量詳細描述發生的過程..."></textarea>
         </div>
@@ -260,10 +253,9 @@
         }
 
         function clearKnowError() {
-            document.getElementById('know_row').classList.remove('row-error');
+            document.getElementById('know_row').style.borderColor = 'transparent';
         }
 
-        // --- 修改後的提交邏輯 ---
         async function submitFinal() {
             let isValid = true;
             const t = document.getElementById('t_val'), p = document.getElementById('p_val'), d = document.getElementById('desc_val');
@@ -271,14 +263,15 @@
             const submitBtn = document.getElementById('final-submit');
 
             [t, p, d].forEach(el => { if (!el.disabled && !el.value.trim()) { el.classList.add('input-error'); isValid = false; } });
-            if (!knowRadio) { document.getElementById('know_row').classList.add('row-error'); isValid = false; }
+            if (!knowRadio) { document.getElementById('know_row').style.borderColor = 'var(--error-red)'; isValid = false; }
 
             if (!isValid) return;
 
             submitBtn.disabled = true;
             submitBtn.innerText = "傳送中...";
 
-            const soss995Data = {
+            const payload = {
+                "timestamp": new Date().toLocaleString(),
                 "reporter": {
                     "class": document.getElementById('class').value,
                     "name": document.getElementById('name').value,
@@ -298,22 +291,23 @@
             };
 
             try {
-                // 發送到 Vercel Serverless Function
-                const response = await fetch('/api/submit', {
+                // 指向 Vercel Serverless Function
+                const res = await fetch('/api/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(soss995Data)
+                    body: JSON.stringify(payload)
                 });
 
-                if (response.ok) {
+                if (res.ok) {
                     showSuccess();
                 } else {
-                    alert("傳送失敗，請聯繫管理員");
+                    const errorMsg = await res.json();
+                    alert("提交失敗：" + (errorMsg.error || "未知錯誤"));
                     submitBtn.disabled = false;
+                    submitBtn.innerText = "重新提交";
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("網路異常，請稍後再試");
+            } catch (e) {
+                alert("網路連線錯誤");
                 submitBtn.disabled = false;
             }
         }
@@ -323,12 +317,12 @@
             card.style.opacity = '0';
             setTimeout(() => {
                 card.innerHTML = `
-                            <h2 style="color: var(--success-green);">傳送成功</h2>
-                            <p style="line-height: 1.8; font-size: 1.1rem; text-align: left;">
-                                我們已收到你的求助資訊。請放心，這些內容只有相關負責老師可以看到，我們會盡快協助妳處理。
-                            </p>
-                            <button class="next-btn" onclick="window.location.reload()">完成並退出</button>
-                        `;
+                        <h2 style="color: var(--success-green);">傳送成功</h2>
+                        <p style="line-height: 1.8; font-size: 1.1rem; text-align: left;">
+                            我們已收到你的求助資訊。這些內容只有相關負責人員可以看到，我們會盡快處理。
+                        </p>
+                        <button class="next-btn" onclick="window.location.reload()">完成並退出</button>
+                    `;
                 card.style.opacity = '1';
             }, 400);
         }
