@@ -5,8 +5,8 @@
     }
 
     const TOKEN = process.env.GIT_TOKEN;
-    const REPO_OWNER = "你的GitHub帳號"; // 這裡請務必填寫正確，例如 "my-name"
-    const REPO_NAME = "你的專案名稱";    // 這裡請務必填寫正確，例如 "gm-site"
+    const REPO_OWNER = "horyuisme2011-jpg"; // 這裡請務必填寫正確，例如 "my-name"
+    const REPO_NAME = "tycgm885";    // 這裡請務必填寫正確，例如 "gm-site"
     const FILE_PATH = "soss995.json";
 
     // 檢查 Token 是否存在 (排除 Vercel 設定問題)
