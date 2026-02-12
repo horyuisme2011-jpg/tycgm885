@@ -11,6 +11,7 @@
             --gold: #f39c12;
             --text-white: #ffffff;
             --success-green: #2ecc71;
+            --accent-blue: #3b82f6;
         }
 
         body {
@@ -22,9 +23,89 @@
             justify-content: center;
             align-items: center;
             color: var(--text-white);
-            overflow-x: hidden;
+            overflow: hidden; /* 防止公告彈出時背景滑動 */
         }
 
+        /* 公告彈窗樣式 */
+        #announceOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .announce-card {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .ann-header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+            .ann-header h2 {
+                margin: 0;
+                color: var(--gold);
+                font-size: 1.5rem;
+            }
+
+        .ann-body {
+            padding: 25px;
+            overflow-y: auto;
+            flex: 1;
+            line-height: 1.8;
+            color: #e2e8f0;
+            font-size: 1.05rem;
+        }
+
+            .ann-body h3 {
+                color: var(--success-green);
+                border-left: 4px solid var(--success-green);
+                padding-left: 10px;
+                margin-top: 25px;
+            }
+
+        .ann-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        #agreeBtn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            font-weight: bold;
+            cursor: not-allowed;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
+            #agreeBtn.active {
+                background: var(--accent-blue);
+                color: white;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            }
+
+        /* 原有卡片樣式 */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(15px);
@@ -87,12 +168,6 @@
             border: 2px solid var(--error-red) !important;
         }
 
-        .row-error {
-            border: 2px solid var(--error-red);
-            border-radius: 10px;
-            padding: 8px;
-        }
-
         .check-item {
             display: flex;
             align-items: center;
@@ -121,11 +196,6 @@
                 background: var(--gold);
                 color: white;
                 transform: translateY(-2px);
-            }
-
-            .next-btn:disabled {
-                background: #666;
-                cursor: not-allowed;
             }
 
         textarea {
@@ -163,7 +233,35 @@
 </head>
 <body>
 
-    <div id="step1" class="glass-card">
+    <div id="announceOverlay">
+        <div class="announce-card">
+            <div class="ann-header"><h2>📢 重要守則與公告</h2></div>
+            <div id="annContent" class="ann-body">
+                <p>親愛的同學們：<br>校園是我們共同學習與成長的家園。為了確保每位同學都能在安全、尊重的環境中生活，校方特別重申以下準則，請全體同學共同遵守：</p>
+
+                <h3>1. 守住玩笑的界線</h3>
+                <p>請勿拿其他同學開玩笑。 幽默應建立在雙方都感到愉快的基礎上，而非建立在他人的難堪或痛苦之上。言語的力量巨大，請學會尊重彼此的差異，不隨意評論、嘲笑或戲弄他人。</p>
+
+                <h3>2. 誠實負責的態度</h3>
+                <p>若發現任何惡意造謠、抹黑或毀損他人名譽之虛假情事，校方將秉持公平公正原則，嚴格依照校規處理。請各位同學對自己的言行負責，切勿傳播未經證實的消息。</p>
+
+                <h3>3. 成為溫暖的守護者</h3>
+                <p>如果你發現身邊有同學正在遭受霸凌、排擠或任何不當對待，請不要選擇沉默。我們熱烈歡迎並鼓勵你伸出援手協助她！</p>
+                <p>你可以：<br>• 給予受害者情緒上的支持。<br>• 主動向老師、輔導室或家長反應情況或填寫網站。</p>
+
+                <p style="font-style: italic; color: var(--gold); text-align: center; margin-top: 30px;">
+                    「尊重是同理心的起點，善良是選擇後的勇敢。」<br>
+                    讓我們一起杜絕霸凌，讓校園成為每個人都能安心微笑的地方。
+                </p>
+                <div style="height: 20px;"></div>
+            </div>
+            <div class="ann-footer">
+                <button id="agreeBtn" disabled>請閱讀公告至底部</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="step1" class="glass-card hidden">
         <h2>你的連絡資訊</h2>
         <div id="form1_fields"></div>
         <button class="next-btn" onclick="toStep2()">下一步</button>
@@ -205,11 +303,31 @@
     </div>
 
     <script>
+        // 公告滾動偵測
+        const annContent = document.getElementById('annContent');
+        const agreeBtn = document.getElementById('agreeBtn');
+
+        annContent.onscroll = function () {
+            // 偵測是否滑到底部
+            if (annContent.scrollHeight - annContent.scrollTop <= annContent.clientHeight + 20) {
+                agreeBtn.disabled = false;
+                agreeBtn.classList.add('active');
+                agreeBtn.innerText = "我已閱讀並同意以上準則";
+            }
+        };
+
+        agreeBtn.onclick = function () {
+            document.getElementById('announceOverlay').style.display = 'none';
+            document.getElementById('step1').classList.remove('hidden');
+            document.body.style.overflow = 'auto'; // 恢復背景滑動
+        };
+
+        // 表單邏輯
         const gconfig1 = {
             "fields": [
                 { "id": "class", "label": "班級", "required": true, "p": "例如：805" },
                 { "id": "name", "label": "姓名", "required": true, "p": "全名" },
-                { "id": "no", "label": "座號", "required": true, "p": "兩位數座號" },
+                { "id": "no", "label": "座號", "required": true, "p": "座號" },
                 { "id": "instagram", "label": "Instagram ID", "required": false, "p": "選填" }
             ]
         };
@@ -287,21 +405,17 @@
                     }
                 };
 
-                // --- 這裡是你提供的最新 GAS 網址 ---
                 const GAS_URL = "https://script.google.com/macros/s/AKfycbw-1unOPkMbyk0tayU0zecszNlCq0m6lYbldnn5vYQrM5VWTxiVS0gtVJZVrYWGHLtT5A/exec";
 
                 try {
                     await fetch(GAS_URL, {
                         method: 'POST',
-                        mode: 'no-cors', // 必須使用 no-cors 模式
+                        mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(soss995Data)
                     });
-
-                    // 因為 no-cors 無法獲得回應，我們直接判定成功
                     showSuccess();
                 } catch (e) {
-                    console.error("Error:", e);
                     alert("網路傳送錯誤，請稍後再試！");
                     btn.disabled = false;
                     btn.innerText = "重新提交";
