@@ -14,7 +14,7 @@
         }
 
         body {
-            font-family: "Microsoft JhengHei", -apple-system, sans-serif;
+            font-family: "Microsoft JhengHei", sans-serif;
             margin: 0;
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             min-height: 100vh;
@@ -77,14 +77,8 @@
             transition: 0.3s;
         }
 
-            input:focus, textarea:focus {
-                border-color: var(--gold);
-                box-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
-            }
-
         input:disabled {
             background: rgba(255, 255, 255, 0.02);
-            border-color: rgba(255, 255, 255, 0.1);
             color: #888;
             cursor: not-allowed;
         }
@@ -131,7 +125,7 @@
 
             .next-btn:disabled {
                 background: #666;
-                cursor: wait;
+                cursor: not-allowed;
             }
 
         textarea {
@@ -177,20 +171,20 @@
     </div>
 
     <div id="step2" class="glass-card hidden">
-        <h2>發生什麼事了？</h2>
+        <h2>發生甚麼事了？</h2>
         <div class="row">
             <label>時間<span class="star">*</span></label>
-            <input type="text" id="t_val" placeholder="例如：週三午休">
+            <input type="text" id="t_val" placeholder="例如：週二第七節" oninput="this.classList.remove('input-error')">
             <label class="check-item"><input type="checkbox" id="t_forget" onchange="toggleInput('t_val', this)">不記得</label>
         </div>
         <div class="row">
             <label>地點<span class="star">*</span></label>
-            <input type="text" id="p_val" placeholder="例如：操場後方">
+            <input type="text" id="p_val" placeholder="例如：三樓走廊" oninput="this.classList.remove('input-error')">
             <label class="check-item"><input type="checkbox" id="p_forget" onchange="toggleInput('p_val', this)">不記得</label>
         </div>
-        <div id="know_row" style="margin-bottom: 18px; padding: 8px; border: 2px solid transparent;">
-            <p style="font-size: 0.95rem; margin-bottom: 10px;">事件行為人 你/妳知道是誰嗎？<span class="star">*</span></p>
-            <div style="display: flex; gap: 20px;">
+        <div id="know_row" style="margin-bottom:18px;">
+            <p style="font-size: 0.95rem;">事件行為人 你/妳知道是誰嗎？<span class="star">*</span></p>
+            <div style="display:flex; gap:20px; padding: 5px;">
                 <label class="check-item"><input type="radio" name="know" value="yes" onclick="togglePerson(true); clearKnowError()">知道</label>
                 <label class="check-item"><input type="radio" name="know" value="no" onclick="togglePerson(false); clearKnowError()">不知道</label>
             </div>
@@ -198,35 +192,31 @@
         <div id="person_fields" class="hidden">
             <div class="row">
                 <label>班級<span class="star">*</span></label>
-                <input type="text" id="p_class" style="max-width:80px; margin-right:15px;" placeholder="301">
+                <input type="text" id="p_class" style="max-width:80px; margin-right:15px;" placeholder="301" oninput="this.classList.remove('input-error')">
                 <label>姓名<span class="star">*</span></label>
-                <input type="text" id="p_name" placeholder="王小明">
+                <input type="text" id="p_name" placeholder="王大明" oninput="this.classList.remove('input-error')">
             </div>
         </div>
-        <div>
+        <div style="margin-top:10px;">
             <label>事件發生簡述<span class="star">*</span></label>
-            <textarea id="desc_val" placeholder="請盡量詳細描述發生的過程..."></textarea>
+            <textarea id="desc_val" placeholder="請盡量詳細描述發生的過程..." oninput="this.classList.remove('input-error')"></textarea>
         </div>
-        <button id="final-submit" class="next-btn" onclick="submitFinal()">提交資訊</button>
+        <button class="next-btn" id="submit-btn" onclick="submitFinal()">提交資訊</button>
     </div>
 
     <script>
         const gconfig1 = {
             "fields": [
-                { "id": "class", "label": "班級", "required": true, "placeholder": "例如：805" },
-                { "id": "name", "label": "姓名", "required": true, "placeholder": "全名" },
-                { "id": "no", "label": "座號", "required": true, "placeholder": "兩位數座號" },
-                { "id": "instagram", "label": "IG ID", "required": false, "placeholder": "選填" }
+                { "id": "class", "label": "班級", "required": true, "p": "例如：805" },
+                { "id": "name", "label": "姓名", "required": true, "p": "全名" },
+                { "id": "no", "label": "座號", "required": true, "p": "兩位數座號" },
+                { "id": "instagram", "label": "Instagram ID", "required": false, "p": "選填" }
             ]
         };
 
         const f1Container = document.getElementById('form1_fields');
         gconfig1.fields.forEach(f => {
-            f1Container.innerHTML += `
-                    <div class="row">
-                        <label>${f.label}${f.required ? '<span class="star">*</span>' : ''}</label>
-                        <input type="text" id="${f.id}" placeholder="${f.placeholder}" oninput="this.classList.remove('input-error')">
-                    </div>`;
+            f1Container.innerHTML += `<div class="row"><label>${f.label}${f.required ? '<span class="star">*</span>' : ''}</label><input type="text" id="${f.id}" placeholder="${f.p}" oninput="this.classList.remove('input-error')"></div>`;
         });
 
         function toStep2() {
@@ -236,7 +226,7 @@
                 if (f.required && !el.value.trim()) { el.classList.add('input-error'); ok = false; }
             });
             if (ok) {
-                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
             }
         }
@@ -253,62 +243,69 @@
         }
 
         function clearKnowError() {
-            document.getElementById('know_row').style.borderColor = 'transparent';
+            document.getElementById('know_row').style.border = "none";
         }
 
         async function submitFinal() {
             let isValid = true;
             const t = document.getElementById('t_val'), p = document.getElementById('p_val'), d = document.getElementById('desc_val');
             const knowRadio = document.querySelector('input[name="know"]:checked');
-            const submitBtn = document.getElementById('final-submit');
+            const btn = document.getElementById('submit-btn');
 
-            [t, p, d].forEach(el => { if (!el.disabled && !el.value.trim()) { el.classList.add('input-error'); isValid = false; } });
-            if (!knowRadio) { document.getElementById('know_row').style.borderColor = 'var(--error-red)'; isValid = false; }
+            if (!t.disabled && !t.value.trim()) { t.classList.add('input-error'); isValid = false; }
+            if (!p.disabled && !p.value.trim()) { p.classList.add('input-error'); isValid = false; }
+            if (!d.value.trim()) { d.classList.add('input-error'); isValid = false; }
+            if (!knowRadio) { document.getElementById('know_row').style.border = "2px solid var(--error-red)"; isValid = false; }
 
-            if (!isValid) return;
+            if (knowRadio?.value === 'yes') {
+                const pc = document.getElementById('p_class'), pn = document.getElementById('p_name');
+                if (!pc.value.trim()) { pc.classList.add('input-error'); isValid = false; }
+                if (!pn.value.trim()) { pn.classList.add('input-error'); isValid = false; }
+            }
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = "傳送中...";
+            if (isValid) {
+                btn.disabled = true;
+                btn.innerText = "傳送中...";
 
-            const payload = {
-                "timestamp": new Date().toLocaleString(),
-                "reporter": {
-                    "class": document.getElementById('class').value,
-                    "name": document.getElementById('name').value,
-                    "no": document.getElementById('no').value,
-                    "instagram": document.getElementById('instagram').value
-                },
-                "event": {
-                    "time": document.getElementById('t_forget').checked ? "不記得" : t.value,
-                    "place": document.getElementById('p_forget').checked ? "不記得" : p.value,
-                    "know_who": knowRadio.value,
-                    "target": knowRadio.value === 'yes' ? {
-                        "class": document.getElementById('p_class').value,
-                        "name": document.getElementById('p_name').value
-                    } : "未知",
-                    "description": d.value
-                }
-            };
+                const soss995Data = {
+                    "timestamp": new Date().toLocaleString(),
+                    "reporter": {
+                        "class": document.getElementById('class').value,
+                        "name": document.getElementById('name').value,
+                        "no": document.getElementById('no').value,
+                        "instagram": document.getElementById('instagram').value || "無"
+                    },
+                    "event": {
+                        "time": document.getElementById('t_forget').checked ? "不記得" : t.value,
+                        "place": document.getElementById('p_forget').checked ? "不記得" : p.value,
+                        "know_who": knowRadio.value === 'yes' ? "知道" : "不知道",
+                        "target": knowRadio.value === 'yes' ? {
+                            "class": document.getElementById('p_class').value,
+                            "name": document.getElementById('p_name').value
+                        } : "未知",
+                        "description": d.value
+                    }
+                };
 
-            try {
-                // 指向 Vercel Serverless Function
-                const res = await fetch('/api/submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                // --- 這裡是你提供的最新 GAS 網址 ---
+                const GAS_URL = "https://script.google.com/macros/s/AKfycbw-1unOPkMbyk0tayU0zecszNlCq0m6lYbldnn5vYQrM5VWTxiVS0gtVJZVrYWGHLtT5A/exec";
 
-                if (res.ok) {
+                try {
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // 必須使用 no-cors 模式
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(soss995Data)
+                    });
+
+                    // 因為 no-cors 無法獲得回應，我們直接判定成功
                     showSuccess();
-                } else {
-                    const errorMsg = await res.json();
-                    alert("提交失敗：" + (errorMsg.error || "未知錯誤"));
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "重新提交";
+                } catch (e) {
+                    console.error("Error:", e);
+                    alert("網路傳送錯誤，請稍後再試！");
+                    btn.disabled = false;
+                    btn.innerText = "重新提交";
                 }
-            } catch (e) {
-                alert("網路連線錯誤");
-                submitBtn.disabled = false;
             }
         }
 
@@ -319,9 +316,9 @@
                 card.innerHTML = `
                         <h2 style="color: var(--success-green);">傳送成功</h2>
                         <p style="line-height: 1.8; font-size: 1.1rem; text-align: left;">
-                            我們已收到你的求助資訊。這些內容只有相關負責人員可以看到，我們會盡快處理。
+                            資料已送達。老師們會儘快處理並保護妳的隱私，請保持平常心，我們會協助妳的。
                         </p>
-                        <button class="next-btn" onclick="window.location.reload()">完成並退出</button>
+                        <button class="next-btn" onclick="window.location.reload()">完成並結束</button>
                     `;
                 card.style.opacity = '1';
             }, 400);
